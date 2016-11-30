@@ -11,21 +11,20 @@ namespace StartTrack
 {
     public class StarSky : Application
     {
-        List<Star> stars = new List<Star>();
+        List<Node> stars = new List<Node>();
         Camera camera;
         Octree octree;
+        Star SelectedStar;
 
         public StarSky(ApplicationOptions options = null) : base(new ApplicationOptions(assetsFolder: "Data") { Height = 1024, Width = 576, Orientation = ApplicationOptions.OrientationType.Portrait }) { }
         
         protected override void Start()
         {
-            CreateScene();
-
-            // Subscribe to Esc key:
-            //Input.SubscribeToKeyDown(args => { if (args.Key == Key.Esc) Exit(); });
+            CreateScene();            
+            Input.SubscribeToKeyDown(args => { if (args.Key == Key.Esc) Exit(); });
         }
 
-        async void CreateScene()
+        void CreateScene()
         {
             Input.SubscribeToTouchEnd(OnTouched);
 
@@ -41,35 +40,24 @@ namespace StartTrack
             // 3D scene with Octree
             var scene = new Scene(Context);
             octree = scene.CreateComponent<Octree>();
-
-            // Box	
-            Node starNode = scene.CreateChild(name: "Box node");
-            starNode.Position = new Vector3(0, 0, 0);
-            starNode.SetScale(1);
-            starNode.Rotation = new Quaternion(0,90,0);
             
-            StaticModel starModel = starNode.CreateComponent<StaticModel>();
-            starModel.Model = ResourceCache.GetModel("Models/Star.mdl");
-            starModel.SetMaterial(ResourceCache.GetMaterial("Materials/Star.xml"));
-            
-            // Light
-            Node lightNode = scene.CreateChild(name: "light");
-            var light = lightNode.CreateComponent<Light>();
-            light.Range = 10;
-            light.Brightness = 10f;
-            lightNode.Position = new Vector3(0,0,-10);
-            
+            for (int i = 0; i < 10; i++)
+            {
+                var starNode = scene.CreateChild();
+                Random randomY = new Random();
+                
+                starNode.Position = new Vector3(6*i,randomY.Next(0,20)*5,0);                            
+                var star = new Star();
+                starNode.AddComponent(star);
+                stars.Add(starNode);                
+            }
+                 
             // Camera
             Node cameraNode = scene.CreateChild(name: "camera");
             camera = cameraNode.CreateComponent<Camera>();
             cameraNode.Position = new Vector3(30,50,-150);
             // Viewport
-            Renderer.SetViewport(0, new Viewport(Context, scene, camera, null));
-
-            // Do actions
-            /*await starNode.RunActionsAsync(new EaseBounceOut(new ScaleTo(duration: 1f, scale: 1)));
-            await starNode.RunActionsAsync(new RepeatForever(
-                new RotateBy(duration: 1, deltaAngleX: 90, deltaAngleY: 0, deltaAngleZ: 0)));*/
+            Renderer.SetViewport(0, new Viewport(Context, scene, camera, null));            
         }
 
         void OnTouched(TouchEndEventArgs e)
@@ -78,8 +66,14 @@ namespace StartTrack
             var results = octree.Raycast(cameraRay, RayQueryLevel.Triangle, 500, DrawableFlags.Geometry);
             if (results != null && results.Any())
             {
-                var star = results[0];                
-                star.Node.RunActionsAsync(new RepeatForever(new EaseBackOut(new ScaleTo(duration: 0.7f, scale: 1.3f)), new EaseBackOut(new ScaleTo(duration: 0.7f, scale: 1))));
+                var star = results[0].Node?.Parent?.GetComponent<Star>();
+                if (SelectedStar != star)
+                {
+                    SelectedStar?.Deselect();
+                    SelectedStar = star;
+                    SelectedStar?.Select();
+                    
+                }                       
             }
         }
     }
