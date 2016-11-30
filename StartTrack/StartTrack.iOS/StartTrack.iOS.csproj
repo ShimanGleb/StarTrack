@@ -133,6 +133,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <BundleResource Include="Resources\Data\Materials\Star.xml" />
+    <BundleResource Include="Resources\Data\Materials\Track.xml" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <InterfaceDefinition Include="Resources\LaunchScreen.xib" />
@@ -144,6 +145,7 @@
     <BundleResource Include="Resources\Data\Materials\BoxMaterial.xml" />
     <BundleResource Include="Resources\Data\Textures\xamarin.png" />
     <BundleResource Include="Resources\Data\Models\Star.mdl" />
+    <BundleResource Include="Resources\Data\Models\Track.mdl" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

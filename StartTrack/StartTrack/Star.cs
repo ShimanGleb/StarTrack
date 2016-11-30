@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Urho;
 using Urho.Actions;
-using Urho.Gui;
-using Urho.Resources;
-using Urho.Shapes;
 
 namespace StartTrack
 {

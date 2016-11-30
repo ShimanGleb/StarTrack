@@ -70,6 +70,7 @@
     <AndroidAsset Include="Assets\Data\Materials\BoxMaterial.xml" />
     <AndroidAsset Include="Assets\Data\Textures\xamarin.png" />
     <AndroidAsset Include="Assets\Data\Models\Star.mdl" />
+    <AndroidAsset Include="Assets\Data\Models\Track.mdl" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\Data\Materials\Star.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Data\Materials\Track.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\packages\UrhoSharp.1.1.214\build\MonoAndroid\UrhoSharp.targets" Condition="Exists('..\..\packages\UrhoSharp.1.1.214\build\MonoAndroid\UrhoSharp.targets')" />

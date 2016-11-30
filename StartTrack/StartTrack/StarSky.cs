@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+
 using Urho;
 using Urho.Gui;
-using Urho.Actions;
-using Urho.Shapes;
 
 namespace StartTrack
 {
     public class StarSky : Application
     {
         List<Node> stars = new List<Node>();
-        Camera camera;
+        Scene scene;
         Octree octree;
-        Star SelectedStar;
+        Camera camera;
+        
+        Star SelectedStar=null;
 
         public StarSky(ApplicationOptions options = null) : base(new ApplicationOptions(assetsFolder: "Data") { Height = 1024, Width = 576, Orientation = ApplicationOptions.OrientationType.Portrait }) { }
         
@@ -38,9 +38,21 @@ namespace StartTrack
             UI.Root.AddChild(helloText);
 
             // 3D scene with Octree
-            var scene = new Scene(Context);
+            scene = new Scene(Context);
             octree = scene.CreateComponent<Octree>();
-            
+
+            Node cameraNode = scene.CreateChild(name: "camera");
+            camera = cameraNode.CreateComponent<Camera>();
+            cameraNode.Position = new Vector3(30, 50, -150);
+            // Viewport
+            Renderer.SetViewport(0, new Viewport(Context, scene, camera, null));
+
+            var lightNode = scene.CreateChild();
+            var light = lightNode.CreateComponent<Light>();
+            light.Range = 200;
+            light.Brightness = 150f;
+            lightNode.Position = new Vector3(0, 0, -150);
+
             for (int i = 0; i < 10; i++)
             {
                 var starNode = scene.CreateChild();
@@ -50,14 +62,7 @@ namespace StartTrack
                 var star = new Star();
                 starNode.AddComponent(star);
                 stars.Add(starNode);                
-            }
-                 
-            // Camera
-            Node cameraNode = scene.CreateChild(name: "camera");
-            camera = cameraNode.CreateComponent<Camera>();
-            cameraNode.Position = new Vector3(30,50,-150);
-            // Viewport
-            Renderer.SetViewport(0, new Viewport(Context, scene, camera, null));            
+            }                  
         }
 
         void OnTouched(TouchEndEventArgs e)
@@ -69,11 +74,31 @@ namespace StartTrack
                 var star = results[0].Node?.Parent?.GetComponent<Star>();
                 if (SelectedStar != star)
                 {
+                    if (SelectedStar != null)
+                    {
+                        var trackNode = scene.CreateChild();
+                        Random randomY = new Random();
+
+                        trackNode.Position = SelectedStar.Node.Position;
+                        var track = new Track();
+                        trackNode.AddComponent(track);                        
+
+                        var angle=TrigonometryHelper.GetAngle(SelectedStar.Node.Position, star.Node.Position);
+
+                        trackNode.Rotation = new Quaternion(0, 0, angle);
+                        trackNode.Position = TrigonometryHelper.GetBetween(SelectedStar.Node.Position,star.Node.Position);
+                        trackNode.Position = new Vector3(trackNode.Position.X, trackNode.Position.Y,0);
+                        trackNode.Scale = new Vector3(TrigonometryHelper.GetDistance(SelectedStar.Node.Position,star.Node.Position),0.5f,1);
+                    }                    
                     SelectedStar?.Deselect();
                     SelectedStar = star;
-                    SelectedStar?.Select();
-                    
-                }                       
+                    SelectedStar?.Select();                    
+                }
+                else
+                {
+                    SelectedStar?.Deselect();
+                    SelectedStar = null;
+                }                
             }
         }
     }
